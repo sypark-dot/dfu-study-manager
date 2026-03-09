@@ -185,6 +185,28 @@ export function SubjectRow({ subject, onUpdate, onEdit, onDelete }: SubjectRowPr
             </div>
           </div>
 
+          {/* Baseline Blood Test & Next Visit Info */}
+          <div className="mb-2 grid grid-cols-2 gap-x-4 gap-y-1 rounded-md border border-border bg-card p-2 text-xs sm:grid-cols-3">
+            <div>
+              <span className="font-medium text-foreground">혈액검사 / Blood Test</span>
+              <div className={!subject.bloodTestResult && !subject.bloodTestReason ? "text-red-600 font-semibold" : ""}>
+                {subject.bloodTestResult || (subject.bloodTestReason ? `미시행: ${subject.bloodTestReason}` : "미입력")}
+              </div>
+            </div>
+            <div>
+              <span className="font-medium text-foreground">Baseline 다음 예약</span>
+              <div className={!subject.baselineNextVisitDate ? "text-red-600 font-semibold" : ""}>
+                {subject.baselineNextVisitDate || "미입력"}
+              </div>
+            </div>
+            {subject.bloodTestReason && (
+              <div className="col-span-2 sm:col-span-1">
+                <span className="font-medium text-foreground">혈액검사 미시행 사유</span>
+                <div className="text-amber-600">{subject.bloodTestReason}</div>
+              </div>
+            )}
+          </div>
+
           {/* LTF Toggle */}
           <div className="mb-2 flex items-center gap-3 rounded-md border border-border bg-card p-2">
             <Label htmlFor={`ltf-${subject.id}`} className="flex-1 text-xs font-medium">

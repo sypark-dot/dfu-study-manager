@@ -9,6 +9,7 @@ export interface VisitData {
   actualDate: string | null
   reason: string
   interval: VisitInterval // weeks until this visit from previous
+  nextVisitDate?: string | null // 다음 예약 날짜
 }
 
 export interface Subject {
@@ -32,6 +33,10 @@ export interface Subject {
   notes: string
   createdAt: string
   updatedAt: string
+  // Baseline 혈액검사 관련 필드
+  bloodTestResult?: string | null // 혈액검사 결과
+  bloodTestReason?: string | null // 혈액검사 미시행 사유
+  baselineNextVisitDate?: string | null // Baseline 다음 예약 날짜
 }
 
 export type FUKey = "fu1" | "fu2" | "fu3" | "fu4"
@@ -57,6 +62,7 @@ export function createEmptyVisit(interval: VisitInterval = 2): VisitData {
     actualDate: null,
     reason: "",
     interval,
+    nextVisitDate: null,
   }
 }
 
@@ -83,5 +89,8 @@ export function createDefaultSubject(site: Site, defaultInterval: VisitInterval 
     notes: "",
     createdAt: now,
     updatedAt: now,
+    bloodTestResult: null,
+    bloodTestReason: null,
+    baselineNextVisitDate: null,
   }
 }

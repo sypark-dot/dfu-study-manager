@@ -119,7 +119,7 @@ export function VisitDetailRow({ subject, fuKey, onUpdate, compact }: VisitDetai
         </Button>
       </div>
 
-      <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-muted-foreground sm:grid-cols-5">
+      <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-muted-foreground sm:grid-cols-6">
         <div>
           <span className="font-medium text-foreground">간격 / Interval</span>
           <div>{visit.interval ?? subject.visitInterval}주</div>
@@ -140,11 +140,17 @@ export function VisitDetailRow({ subject, fuKey, onUpdate, compact }: VisitDetai
           <span className="font-medium text-foreground">사유 / Reason</span>
           <div>{visit.reason || "-"}</div>
         </div>
+        <div>
+          <span className="font-medium text-foreground">다음 예약 / Next Visit</span>
+          <div className={!visit.nextVisitDate ? "text-red-600 font-semibold" : ""}>
+            {visit.nextVisitDate ? formatDate(visit.nextVisitDate) : "미입력"}
+          </div>
+        </div>
       </div>
 
       {editing && (
         <div className="mt-2 flex flex-col gap-3 rounded border border-border bg-card p-3">
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-4">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-5">
             <div className="flex flex-col gap-1">
               <label className="text-xs font-medium text-foreground">F/U 간격 / Interval</label>
               <Select
@@ -194,6 +200,15 @@ export function VisitDetailRow({ subject, fuKey, onUpdate, compact }: VisitDetai
                 placeholder="Optional reason"
                 value={localVisit.reason}
                 onChange={(e) => setLocalVisit((p) => ({ ...p, reason: e.target.value }))}
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-medium text-foreground">다음 예약일 / Next Visit</label>
+              <Input
+                type="date"
+                className="h-8 text-xs"
+                value={localVisit.nextVisitDate || ""}
+                onChange={(e) => setLocalVisit((p) => ({ ...p, nextVisitDate: e.target.value || null }))}
               />
             </div>
           </div>
