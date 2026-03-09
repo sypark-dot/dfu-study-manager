@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo, useCallback, useEffect } from "react"
-import { Plus, Download, MapPin, CalendarCheck, Search, LogOut, Loader2 } from "lucide-react"
+import { Plus, Download, MapPin, CalendarCheck, Search, LogOut, Loader2, List, ClipboardList } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -21,6 +21,7 @@ import { hasVisitToday, hasVisitExactlyToday } from "@/lib/visit-utils"
 import { exportToCSV } from "@/lib/export-utils"
 import { SubjectForm } from "./subject-form"
 import { SubjectRow } from "./subject-row"
+import { CompletionSummary } from "./completion-summary"
 
 interface DashboardProps {
   onLogout: () => void
@@ -37,6 +38,7 @@ export function Dashboard({ onLogout }: DashboardProps) {
   const [searchQuery, setSearchQuery] = useState("")
   const [todayMode, setTodayMode] = useState(false)
   const [exactTodayMode, setExactTodayMode] = useState(false)
+  const [viewMode, setViewMode] = useState<"list" | "summary">("list")
 
   useEffect(() => {
     getSubjects()
@@ -181,6 +183,27 @@ export function Dashboard({ onLogout }: DashboardProps) {
             <Label htmlFor="exact-today-mode" className="cursor-pointer text-xs">당일 방문</Label>
             <Switch id="exact-today-mode" checked={exactTodayMode} onCheckedChange={(checked) => { setExactTodayMode(checked); if (checked) setTodayMode(false) }} className="scale-75" />
           </div>
+          {/* View Mode Toggle */}
+          <div className="flex items-center gap-1 rounded-md border border-border bg-card p-0.5">
+            <Button
+              size="sm"
+              variant={viewMode === "list" ? "default" : "ghost"}
+              className="h-7 px-2 text-xs"
+              onClick={() => setViewMode("list")}
+            >
+              <List className="mr-1 h-3.5 w-3.5" />
+              목록
+            </Button>
+            <Button
+              size="sm"
+              variant={viewMode === "summary" ? "default" : "ghost"}
+              className="h-7 px-2 text-xs"
+              onClick={() => setViewMode("summary")}
+            >
+              <ClipboardList className="mr-1 h-3.5 w-3.5" />
+              완료현황
+            </Button>
+          </div>
           <Badge variant="secondary" className="ml-auto text-xs">{filteredSubjects.length}건 / {subjects.length}건</Badge>
         </div>
       </div>
@@ -195,16 +218,18 @@ export function Dashboard({ onLogout }: DashboardProps) {
         </div>
       </div>
 
-      <div className="mx-auto w-full max-w-7xl">
-        <div className="hidden items-center border-b border-border bg-muted/50 px-4 py-2 text-xs font-medium text-muted-foreground sm:flex">
-          <span className="w-6" />
-          <span className="flex-1">대상자 정보 / Subject Info</span>
-          <span className="w-32 text-center">FU1-FU4</span>
-          <span className="w-16" />
+      {viewMode === "list" && (
+        <div className="mx-auto w-full max-w-7xl">
+          <div className="hidden items-center border-b border-border bg-muted/50 px-4 py-2 text-xs font-medium text-muted-foreground sm:flex">
+            <span className="w-6" />
+            <span className="flex-1">대상자 정보 / Subject Info</span>
+            <span className="w-32 text-center">FU1-FU4</span>
+            <span className="w-16" />
+          </div>
         </div>
-      </div>
+      )}
 
-      <main className="mx-auto w-full max-w-7xl flex-1">
+      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-2">
         {filteredSubjects.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <p className="text-sm text-muted-foreground">
@@ -216,6 +241,8 @@ export function Dashboard({ onLogout }: DashboardProps) {
               </Button>
             )}
           </div>
+        ) : viewMode === "summary" ? (
+          <CompletionSummary subjects={filteredSubjects} onUpdate={handleUpdate} />
         ) : (
           <div className="divide-y divide-border">
             {filteredSubjects.map((subject) => (
