@@ -1,1 +1,0 @@
-# dfu-study-manager

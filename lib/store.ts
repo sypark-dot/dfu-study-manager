@@ -1,8 +1,47 @@
-import { supabase } from "./supabase"
 import type { Subject } from "./types"
 
-const AUTH_KEY = "dfu_authed"
-const PASSWORD = process.env.NEXT_PUBLIC_APP_PASSWORD || "lexsoft2024"
+const STORAGE_KEY = "dfu-study-subjects"
+const AUTH_KEY = "dfu-study-auth"
+const PASSWORD = "dfu2025!"
+
+export function getSubjects(): Subject[] {
+  if (typeof window === "undefined") return []
+  try {
+    const data = localStorage.getItem(STORAGE_KEY)
+    return data ? JSON.parse(data) : []
+  } catch {
+    return []
+  }
+}
+
+export function saveSubjects(subjects: Subject[]): void {
+  if (typeof window === "undefined") return
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(subjects))
+}
+
+export function addSubject(subject: Subject): Subject[] {
+  const subjects = getSubjects()
+  subjects.push(subject)
+  saveSubjects(subjects)
+  return subjects
+}
+
+export function updateSubject(updated: Subject): Subject[] {
+  const subjects = getSubjects()
+  const index = subjects.findIndex((s) => s.id === updated.id)
+  if (index !== -1) {
+    updated.updatedAt = new Date().toISOString()
+    subjects[index] = updated
+    saveSubjects(subjects)
+  }
+  return subjects
+}
+
+export function deleteSubject(id: string): Subject[] {
+  const subjects = getSubjects().filter((s) => s.id !== id)
+  saveSubjects(subjects)
+  return subjects
+}
 
 export function checkPassword(pw: string): boolean {
   return pw === PASSWORD
@@ -13,97 +52,11 @@ export function isAuthenticated(): boolean {
   return localStorage.getItem(AUTH_KEY) === "true"
 }
 
-export function setAuthenticated(value: boolean) {
+export function setAuthenticated(val: boolean): void {
   if (typeof window === "undefined") return
-  if (value) {
+  if (val) {
     localStorage.setItem(AUTH_KEY, "true")
   } else {
     localStorage.removeItem(AUTH_KEY)
-  }
-}
-
-export async function getSubjects(): Promise<Subject[]> {
-  const { data, error } = await supabase
-    .from("subjects")
-    .select("*")
-    .order("subject_id", { ascending: true })
-
-  if (error) {
-    console.error("getSubjects error:", error)
-    return []
-  }
-
-  return (data || []).map(rowToSubject)
-}
-
-export async function addSubject(subject: Subject): Promise<Subject> {
-  const { data, error } = await supabase
-    .from("subjects")
-    .insert(subjectToRow(subject))
-    .select()
-    .single()
-
-  if (error) throw new Error(error.message)
-  return rowToSubject(data)
-}
-
-export async function updateSubject(subject: Subject): Promise<Subject> {
-  const { data, error } = await supabase
-    .from("subjects")
-    .update(subjectToRow(subject))
-    .eq("id", subject.id)
-    .select()
-    .single()
-
-  if (error) throw new Error(error.message)
-  return rowToSubject(data)
-}
-
-export async function deleteSubject(id: string): Promise<void> {
-  const { error } = await supabase
-    .from("subjects")
-    .delete()
-    .eq("id", id)
-
-  if (error) throw new Error(error.message)
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function rowToSubject(row: any): Subject {
-  return {
-    id: row.id,
-    subjectId: row.subject_id,
-    subjectName: row.subject_name,
-    phoneNumber: row.phone_number ?? "",
-    hospitalRegNo: row.hospital_reg_no ?? "",
-    ulcerNo: row.ulcer_no ?? 1,
-    staffName: row.staff_name ?? "",
-    baselineDate: row.baseline_date ?? "",
-    visitInterval: row.visit_interval ?? 1,
-    visits: row.visits ?? {
-      fu1: { date: null, status: "pending", interval: 1, notes: "" },
-      fu2: { date: null, status: "pending", interval: 1, notes: "" },
-      fu3: { date: null, status: "pending", interval: 1, notes: "" },
-      fu4: { date: null, status: "pending", interval: 1, notes: "" },
-    },
-    site: row.site,
-    notes: row.notes ?? "",
-  }
-}
-
-function subjectToRow(s: Subject) {
-  return {
-    id: s.id,
-    subject_id: s.subjectId,
-    subject_name: s.subjectName,
-    phone_number: s.phoneNumber,
-    hospital_reg_no: s.hospitalRegNo,
-    ulcer_no: s.ulcerNo,
-    staff_name: s.staffName,
-    baseline_date: s.baselineDate,
-    visit_interval: s.visitInterval,
-    visits: s.visits,
-    site: s.site,
-    notes: s.notes,
   }
 }
