@@ -1,7 +1,7 @@
+import { supabase } from "./supabase"
 import type { Subject } from "./types"
 
 const AUTH_KEY = "dfu_authed"
-const SUBJECTS_KEY = "dfu_subjects"
 const PASSWORD = process.env.NEXT_PUBLIC_APP_PASSWORD || "1234"
 
 export function checkPassword(pw: string): boolean {
@@ -23,36 +23,109 @@ export function setAuthenticated(value: boolean) {
 }
 
 export async function getSubjects(): Promise<Subject[]> {
-  if (typeof window === "undefined") return []
-  
-  try {
-    const stored = localStorage.getItem(SUBJECTS_KEY)
-    if (!stored) return []
-    return JSON.parse(stored) as Subject[]
-  } catch (error) {
+  const { data, error } = await supabase
+    .from("subjects")
+    .select("*")
+    .order("created_at", { ascending: false })
+
+  if (error) {
     console.error("getSubjects error:", error)
     return []
   }
+
+  return (data ?? []).map(mapDbToSubject)
 }
 
 export async function addSubject(subject: Subject): Promise<Subject> {
-  const subjects = await getSubjects()
-  subjects.push(subject)
-  localStorage.setItem(SUBJECTS_KEY, JSON.stringify(subjects))
-  return subject
+  const dbSubject = mapSubjectToDb(subject)
+
+  const { data, error } = await supabase
+    .from("subjects")
+    .insert(dbSubject)
+    .select()
+    .single()
+
+  if (error) {
+    console.error("addSubject error:", error)
+    throw error
+  }
+
+  return mapDbToSubject(data)
 }
 
 export async function updateSubject(subject: Subject): Promise<Subject> {
-  const subjects = await getSubjects()
-  const index = subjects.findIndex((s) => s.id === subject.id)
-  if (index === -1) throw new Error("Subject not found")
-  subjects[index] = { ...subject, updatedAt: new Date().toISOString() }
-  localStorage.setItem(SUBJECTS_KEY, JSON.stringify(subjects))
-  return subjects[index]
+  const dbSubject = mapSubjectToDb({
+    ...subject,
+    updatedAt: new Date().toISOString(),
+  })
+
+  const { data, error } = await supabase
+    .from("subjects")
+    .update(dbSubject)
+    .eq("id", subject.id)
+    .select()
+    .single()
+
+  if (error) {
+    console.error("updateSubject error:", error)
+    throw error
+  }
+
+  return mapDbToSubject(data)
 }
 
 export async function deleteSubject(id: string): Promise<void> {
-  const subjects = await getSubjects()
-  const filtered = subjects.filter((s) => s.id !== id)
-  localStorage.setItem(SUBJECTS_KEY, JSON.stringify(filtered))
+  const { error } = await supabase.from("subjects").delete().eq("id", id)
+
+  if (error) {
+    console.error("deleteSubject error:", error)
+    throw error
+  }
+}
+
+// Database column names use snake_case, app uses camelCase
+function mapDbToSubject(db: Record<string, unknown>): Subject {
+  return {
+    id: db.id as string,
+    site: db.site as Subject["site"],
+    subjectId: db.subject_id as string,
+    subjectName: db.subject_name as string,
+    phoneNumber: db.phone_number as string,
+    hospitalRegNo: db.hospital_reg_no as string,
+    ulcerNo: db.ulcer_no as number,
+    staffName: db.staff_name as string,
+    baselineDate: db.baseline_date as string,
+    visitInterval: db.visit_interval as Subject["visitInterval"],
+    isLTF: db.is_ltf as boolean,
+    visits: db.visits as Subject["visits"],
+    notes: db.notes as string,
+    createdAt: db.created_at as string,
+    updatedAt: db.updated_at as string,
+    bloodTestResult: db.blood_test_result as string | null,
+    bloodTestReason: db.blood_test_reason as string | null,
+    baselineNextVisitDate: db.baseline_next_visit_date as string | null,
+  }
+}
+
+function mapSubjectToDb(subject: Subject): Record<string, unknown> {
+  return {
+    id: subject.id,
+    site: subject.site,
+    subject_id: subject.subjectId,
+    subject_name: subject.subjectName,
+    phone_number: subject.phoneNumber,
+    hospital_reg_no: subject.hospitalRegNo,
+    ulcer_no: subject.ulcerNo,
+    staff_name: subject.staffName,
+    baseline_date: subject.baselineDate,
+    visit_interval: subject.visitInterval,
+    is_ltf: subject.isLTF,
+    visits: subject.visits,
+    notes: subject.notes,
+    created_at: subject.createdAt,
+    updated_at: subject.updatedAt,
+    blood_test_result: subject.bloodTestResult ?? null,
+    blood_test_reason: subject.bloodTestReason ?? null,
+    baseline_next_visit_date: subject.baselineNextVisitDate ?? null,
+  }
 }
