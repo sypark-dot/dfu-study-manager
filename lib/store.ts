@@ -2,7 +2,7 @@ import { supabase } from "./supabase"
 import type { Subject } from "./types"
 
 const AUTH_KEY = "dfu_authed"
-const PASSWORD = process.env.NEXT_PUBLIC_APP_PASSWORD || "lexsoft2024"
+const PASSWORD = process.env.NEXT_PUBLIC_APP_PASSWORD || "1234"
 
 export function checkPassword(pw: string): boolean {
   return pw === PASSWORD
