@@ -21,6 +21,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
+import { Switch } from "@/components/ui/switch"
 import { CheckCircle, XCircle, Edit2 } from "lucide-react"
 import type { Subject, FUKey } from "@/lib/types"
 import { formatDate } from "@/lib/visit-utils"
@@ -35,7 +36,7 @@ const FU_KEYS: FUKey[] = ["fu1", "fu2", "fu3", "fu4"]
 export function CompletionSummary({ subjects, onUpdate }: CompletionSummaryProps) {
   const [editingSubject, setEditingSubject] = useState<Subject | null>(null)
   const [editForm, setEditForm] = useState<{
-    bloodTestResult: string
+    bloodTestDone: boolean | null
     bloodTestReason: string
     baselineNextVisitDate: string
     fu1NextVisitDate: string
@@ -43,7 +44,7 @@ export function CompletionSummary({ subjects, onUpdate }: CompletionSummaryProps
     fu3NextVisitDate: string
     fu4NextVisitDate: string
   }>({
-    bloodTestResult: "",
+    bloodTestDone: null,
     bloodTestReason: "",
     baselineNextVisitDate: "",
     fu1NextVisitDate: "",
@@ -55,7 +56,7 @@ export function CompletionSummary({ subjects, onUpdate }: CompletionSummaryProps
   function openEdit(subject: Subject) {
     setEditingSubject(subject)
     setEditForm({
-      bloodTestResult: subject.bloodTestResult || "",
+      bloodTestDone: subject.bloodTestDone ?? null,
       bloodTestReason: subject.bloodTestReason || "",
       baselineNextVisitDate: subject.baselineNextVisitDate || "",
       fu1NextVisitDate: subject.visits.fu1.nextVisitDate || "",
@@ -69,8 +70,8 @@ export function CompletionSummary({ subjects, onUpdate }: CompletionSummaryProps
     if (!editingSubject) return
     const updated: Subject = {
       ...editingSubject,
-      bloodTestResult: editForm.bloodTestResult || null,
-      bloodTestReason: editForm.bloodTestReason || null,
+      bloodTestDone: editForm.bloodTestDone,
+      bloodTestReason: editForm.bloodTestDone === false ? (editForm.bloodTestReason || null) : null,
       baselineNextVisitDate: editForm.baselineNextVisitDate || null,
       visits: {
         ...editingSubject.visits,
@@ -85,8 +86,10 @@ export function CompletionSummary({ subjects, onUpdate }: CompletionSummaryProps
     setEditingSubject(null)
   }
 
-  function hasBloodTest(subject: Subject): boolean {
-    return !!(subject.bloodTestResult && subject.bloodTestResult.trim().length > 0)
+  function getBloodTestStatus(subject: Subject): "done" | "not_done" | "not_entered" {
+    if (subject.bloodTestDone === true) return "done"
+    if (subject.bloodTestDone === false) return "not_done"
+    return "not_entered"
   }
 
   function hasNextVisitDate(subject: Subject, visitKey: "baseline" | FUKey): boolean {
@@ -147,26 +150,35 @@ export function CompletionSummary({ subjects, onUpdate }: CompletionSummaryProps
                 </TableCell>
                 {/* Blood Test - Baseline only */}
                 <TableCell className="text-center">
-                  {hasBloodTest(subject) ? (
-                    <div className="flex flex-col items-center gap-0.5">
-                      <CheckCircle className="h-4 w-4 text-emerald-600" />
-                      <span className="text-[10px] text-muted-foreground truncate max-w-[100px]">
-                        {subject.bloodTestResult}
-                      </span>
-                    </div>
-                  ) : subject.bloodTestReason ? (
-                    <div className="flex flex-col items-center gap-0.5">
-                      <span className="text-[10px] text-amber-600 font-medium">미시행</span>
-                      <span className="text-[10px] text-muted-foreground truncate max-w-[100px]">
-                        {subject.bloodTestReason}
-                      </span>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center gap-0.5 rounded bg-red-100 px-1.5 py-1">
-                      <XCircle className="h-4 w-4 text-red-600" />
-                      <span className="text-[10px] text-red-600 font-semibold">미입력</span>
-                    </div>
-                  )}
+                  {(() => {
+                    const status = getBloodTestStatus(subject)
+                    if (status === "done") {
+                      return (
+                        <div className="flex flex-col items-center gap-0.5">
+                          <CheckCircle className="h-4 w-4 text-emerald-600" />
+                          <span className="text-[10px] text-emerald-600 font-medium">완료</span>
+                        </div>
+                      )
+                    } else if (status === "not_done") {
+                      return (
+                        <div className="flex flex-col items-center gap-0.5">
+                          <span className="text-[10px] text-amber-600 font-medium">미시행</span>
+                          {subject.bloodTestReason && (
+                            <span className="text-[10px] text-muted-foreground truncate max-w-[100px]">
+                              {subject.bloodTestReason}
+                            </span>
+                          )}
+                        </div>
+                      )
+                    } else {
+                      return (
+                        <div className="flex flex-col items-center gap-0.5 rounded bg-red-100 px-1.5 py-1">
+                          <XCircle className="h-4 w-4 text-red-600" />
+                          <span className="text-[10px] text-red-600 font-semibold">미입력</span>
+                        </div>
+                      )
+                    }
+                  })()}
                 </TableCell>
                 {/* Baseline Next Visit */}
                 <TableCell className="text-center">
@@ -234,25 +246,34 @@ export function CompletionSummary({ subjects, onUpdate }: CompletionSummaryProps
             <div className="rounded-md border border-border bg-muted/30 p-3">
               <h4 className="mb-2 text-sm font-semibold">Baseline 혈액검사</h4>
               <div className="flex flex-col gap-3">
-                <div className="flex flex-col gap-1.5">
-                  <Label htmlFor="edit-bloodTestResult" className="text-xs">혈액검사 결과</Label>
-                  <Input
-                    id="edit-bloodTestResult"
-                    placeholder="예: 정상, HbA1c 7.2% 등"
-                    value={editForm.bloodTestResult}
-                    onChange={(e) => setEditForm((p) => ({ ...p, bloodTestResult: e.target.value }))}
+                <div className="flex items-center gap-3 rounded-md border border-border bg-card p-3">
+                  <Label htmlFor="edit-bloodTestDone" className="flex-1 text-sm">
+                    혈액검사 시행 / Blood Test Done
+                  </Label>
+                  <Switch
+                    id="edit-bloodTestDone"
+                    checked={editForm.bloodTestDone === true}
+                    onCheckedChange={(checked) => {
+                      setEditForm((p) => ({
+                        ...p,
+                        bloodTestDone: checked,
+                        bloodTestReason: checked ? "" : p.bloodTestReason,
+                      }))
+                    }}
                   />
                 </div>
-                <div className="flex flex-col gap-1.5">
-                  <Label htmlFor="edit-bloodTestReason" className="text-xs">미시행 사유</Label>
-                  <Textarea
-                    id="edit-bloodTestReason"
-                    placeholder="혈액검사를 하지 못한 경우 사유를 입력하세요..."
-                    value={editForm.bloodTestReason}
-                    onChange={(e) => setEditForm((p) => ({ ...p, bloodTestReason: e.target.value }))}
-                    rows={2}
-                  />
-                </div>
+                {editForm.bloodTestDone === false && (
+                  <div className="flex flex-col gap-1.5">
+                    <Label htmlFor="edit-bloodTestReason" className="text-xs">미시행 사유</Label>
+                    <Textarea
+                      id="edit-bloodTestReason"
+                      placeholder="혈액검사를 하지 못한 경우 사유를 입력하세요..."
+                      value={editForm.bloodTestReason}
+                      onChange={(e) => setEditForm((p) => ({ ...p, bloodTestReason: e.target.value }))}
+                      rows={2}
+                    />
+                  </div>
+                )}
               </div>
             </div>
 

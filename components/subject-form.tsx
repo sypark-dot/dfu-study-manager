@@ -185,13 +185,20 @@ export function SubjectForm({ open, onClose, onSave, initialData }: SubjectFormP
           <div className="rounded-md border border-border bg-muted/30 p-3">
             <h3 className="mb-3 text-sm font-semibold text-foreground">Baseline 방문 정보</h3>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div className="flex flex-col gap-1.5">
-                <Label htmlFor="bloodTestResult">혈액검사 결과 / Blood Test Result</Label>
-                <Input
-                  id="bloodTestResult"
-                  placeholder="예: 정상, HbA1c 7.2% 등"
-                  value={formData.bloodTestResult || ""}
-                  onChange={(e) => handleChange("bloodTestResult", e.target.value)}
+              <div className="flex items-center gap-3 rounded-md border border-border bg-card p-3">
+                <Label htmlFor="bloodTestDone" className="flex-1 text-sm">
+                  혈액검사 시행 / Blood Test Done
+                </Label>
+                <Switch
+                  id="bloodTestDone"
+                  checked={formData.bloodTestDone === true}
+                  onCheckedChange={(checked) => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      bloodTestDone: checked,
+                      bloodTestReason: checked ? "" : prev.bloodTestReason,
+                    }))
+                  }}
                 />
               </div>
               <div className="flex flex-col gap-1.5">
@@ -204,16 +211,18 @@ export function SubjectForm({ open, onClose, onSave, initialData }: SubjectFormP
                 />
               </div>
             </div>
-            <div className="mt-3 flex flex-col gap-1.5">
-              <Label htmlFor="bloodTestReason">혈액검사 미시행 사유 / Reason if not done</Label>
-              <Textarea
-                id="bloodTestReason"
-                placeholder="혈액검사를 하지 못한 경우 사유를 입력하세요..."
-                value={formData.bloodTestReason || ""}
-                onChange={(e) => handleChange("bloodTestReason", e.target.value)}
-                rows={2}
-              />
-            </div>
+            {!formData.bloodTestDone && (
+              <div className="mt-3 flex flex-col gap-1.5">
+                <Label htmlFor="bloodTestReason">혈액검사 미시행 사유 / Reason if not done</Label>
+                <Textarea
+                  id="bloodTestReason"
+                  placeholder="혈액검사를 하지 못한 경우 사유를 입력하세요..."
+                  value={formData.bloodTestReason || ""}
+                  onChange={(e) => handleChange("bloodTestReason", e.target.value)}
+                  rows={2}
+                />
+              </div>
+            )}
           </div>
 
           <div className="flex flex-col gap-1.5">

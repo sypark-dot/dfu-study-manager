@@ -189,8 +189,8 @@ export function SubjectRow({ subject, onUpdate, onEdit, onDelete }: SubjectRowPr
           <div className="mb-2 grid grid-cols-2 gap-x-4 gap-y-1 rounded-md border border-border bg-card p-2 text-xs sm:grid-cols-3">
             <div>
               <span className="font-medium text-foreground">혈액검사 / Blood Test</span>
-              <div className={!subject.bloodTestResult && !subject.bloodTestReason ? "text-red-600 font-semibold" : ""}>
-                {subject.bloodTestResult || (subject.bloodTestReason ? `미시행: ${subject.bloodTestReason}` : "미입력")}
+              <div className={subject.bloodTestDone === null ? "text-red-600 font-semibold" : subject.bloodTestDone ? "text-emerald-600 font-semibold" : "text-amber-600"}>
+                {subject.bloodTestDone === true ? "완료" : subject.bloodTestDone === false ? "미시행" : "미입력"}
               </div>
             </div>
             <div>
@@ -199,9 +199,9 @@ export function SubjectRow({ subject, onUpdate, onEdit, onDelete }: SubjectRowPr
                 {subject.baselineNextVisitDate || "미입력"}
               </div>
             </div>
-            {subject.bloodTestReason && (
+            {subject.bloodTestDone === false && subject.bloodTestReason && (
               <div className="col-span-2 sm:col-span-1">
-                <span className="font-medium text-foreground">혈액검사 미시행 사유</span>
+                <span className="font-medium text-foreground">미시행 사유</span>
                 <div className="text-amber-600">{subject.bloodTestReason}</div>
               </div>
             )}
