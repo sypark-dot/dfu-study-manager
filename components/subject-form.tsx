@@ -184,32 +184,21 @@ export function SubjectForm({ open, onClose, onSave, initialData }: SubjectFormP
           {/* Baseline 혈액검사 및 다음 예약 섹션 */}
           <div className="rounded-md border border-border bg-muted/30 p-3">
             <h3 className="mb-3 text-sm font-semibold text-foreground">Baseline 방문 정보</h3>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div className="flex items-center gap-3 rounded-md border border-border bg-card p-3">
-                <Label htmlFor="bloodTestDone" className="flex-1 text-sm">
-                  혈액검사 시행 / Blood Test Done
-                </Label>
-                <Switch
-                  id="bloodTestDone"
-                  checked={formData.bloodTestDone === true}
-                  onCheckedChange={(checked) => {
-                    setFormData((prev) => ({
-                      ...prev,
-                      bloodTestDone: checked,
-                      bloodTestReason: checked ? "" : prev.bloodTestReason,
-                    }))
-                  }}
-                />
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <Label htmlFor="baselineNextVisitDate">다음 예약일 / Next Visit Date</Label>
-                <Input
-                  id="baselineNextVisitDate"
-                  type="date"
-                  value={formData.baselineNextVisitDate || ""}
-                  onChange={(e) => handleChange("baselineNextVisitDate", e.target.value)}
-                />
-              </div>
+            <div className="flex items-center gap-3 rounded-md border border-border bg-card p-3">
+              <Label htmlFor="bloodTestDone" className="flex-1 text-sm">
+                혈액검사 시행 / Blood Test Done
+              </Label>
+              <Switch
+                id="bloodTestDone"
+                checked={formData.bloodTestDone === true}
+                onCheckedChange={(checked) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    bloodTestDone: checked,
+                    bloodTestReason: checked ? "" : prev.bloodTestReason,
+                  }))
+                }}
+              />
             </div>
             {!formData.bloodTestDone && (
               <div className="mt-3 flex flex-col gap-1.5">

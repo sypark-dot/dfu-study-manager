@@ -194,9 +194,9 @@ export function SubjectRow({ subject, onUpdate, onEdit, onDelete }: SubjectRowPr
               </div>
             </div>
             <div>
-              <span className="font-medium text-foreground">Baseline 다음 예약</span>
-              <div className={!subject.baselineNextVisitDate ? "text-red-600 font-semibold" : ""}>
-                {subject.baselineNextVisitDate || "미입력"}
+              <span className="font-medium text-foreground">다음 예약 / Next Visit</span>
+              <div className={!subject.baselineNextVisitDate ? "text-red-600 font-semibold" : "text-emerald-600 font-semibold"}>
+                {subject.baselineNextVisitDate ? "입력됨" : "미입력"}
               </div>
             </div>
             {subject.bloodTestDone === false && subject.bloodTestReason && (

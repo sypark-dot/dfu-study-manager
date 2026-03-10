@@ -204,9 +204,7 @@ export function CompletionSummary({ subjects, onUpdate }: CompletionSummaryProps
                     ) : hasNextVisitDate(subject, key) ? (
                       <div className="flex flex-col items-center gap-0.5">
                         <CheckCircle className="h-4 w-4 text-emerald-600" />
-                        <span className="text-[10px] text-muted-foreground">
-                          {formatDate(subject.visits[key].nextVisitDate)}
-                        </span>
+                        <span className="text-[10px] text-emerald-600 font-semibold">입력됨</span>
                       </div>
                     ) : (
                       <div className="flex flex-col items-center gap-0.5 rounded bg-red-100 px-1.5 py-1">
