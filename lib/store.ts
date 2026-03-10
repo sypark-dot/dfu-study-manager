@@ -59,6 +59,8 @@ export async function updateSubject(subject: Subject): Promise<Subject> {
     updatedAt: new Date().toISOString(),
   })
 
+  console.log("[v0] Updating subject with data:", JSON.stringify(dbSubject, null, 2))
+
   const { data, error } = await supabase
     .from("subjects")
     .update(dbSubject)
@@ -68,9 +70,13 @@ export async function updateSubject(subject: Subject): Promise<Subject> {
 
   if (error) {
     console.error("updateSubject error:", error)
+    console.error("[v0] Error code:", error.code)
+    console.error("[v0] Error message:", error.message)
+    console.error("[v0] Error details:", error.details)
     throw error
   }
 
+  console.log("[v0] Update successful, response:", data)
   return mapDbToSubject(data)
 }
 
