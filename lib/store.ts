@@ -59,6 +59,8 @@ export async function updateSubject(subject: Subject): Promise<Subject> {
     updatedAt: new Date().toISOString(),
   })
 
+  console.log("[v0] updateSubject dbSubject:", JSON.stringify(dbSubject, null, 2))
+
   const { data, error } = await supabase
     .from("subjects")
     .update(dbSubject)
@@ -68,6 +70,7 @@ export async function updateSubject(subject: Subject): Promise<Subject> {
 
   if (error) {
     console.error("updateSubject error:", error)
+    console.error("[v0] error details:", JSON.stringify(error, null, 2))
     throw error
   }
 
@@ -77,8 +80,11 @@ export async function updateSubject(subject: Subject): Promise<Subject> {
 export async function deleteSubject(id: string): Promise<void> {
   const { error } = await supabase.from("subjects").delete().eq("id", id)
 
-  if (error) {
-    console.error("deleteSubject error:", error)
+if (error) {
+    console.error("updateSubject error:", error)
+    console.error("[v0] error message:", error.message)
+    console.error("[v0] error hint:", error.hint)
+    console.error("[v0] error details:", error.details)
     throw error
   }
 }
