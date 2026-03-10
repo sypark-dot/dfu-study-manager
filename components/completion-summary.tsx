@@ -21,7 +21,8 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { CheckCircle, XCircle, Edit2, MinusCircle } from "lucide-react"
+import { Textarea } from "@/components/ui/textarea"
+import { CheckCircle, XCircle, Edit2, MinusCircle, Save } from "lucide-react"
 import type { Subject, FUKey } from "@/lib/types"
 
 interface CompletionSummaryProps {
@@ -39,12 +40,35 @@ export function CompletionSummary({ subjects, onUpdate }: CompletionSummaryProps
     nextVisitConfirmed: false,
   })
 
+  // 전체 메모 상태
+  const [notesMap, setNotesMap] = useState<Record<string, string>>(() => {
+    const map: Record<string, string> = {}
+    subjects.forEach((s) => {
+      map[s.id] = s.summaryNotes || ""
+    })
+    return map
+  })
+  const [savingId, setSavingId] = useState<string | null>(null)
+
   function openEdit(subject: Subject) {
     setEditingSubject(subject)
     setEditForm({
       bloodTestDone: subject.bloodTestDone ?? null,
       nextVisitConfirmed: subject.nextVisitConfirmed ?? false,
     })
+  }
+
+  async function saveNotes(subject: Subject) {
+    setSavingId(subject.id)
+    try {
+      onUpdate({
+        ...subject,
+        summaryNotes: notesMap[subject.id] || null,
+        updatedAt: new Date().toISOString(),
+      })
+    } finally {
+      setSavingId(null)
+    }
   }
 
   function handleSave() {
@@ -73,6 +97,10 @@ export function CompletionSummary({ subjects, onUpdate }: CompletionSummaryProps
               <TableHead className="text-center text-xs font-semibold">
                 다음 예약 확인
                 <span className="block text-[10px] font-normal text-muted-foreground">Next Visit Confirmed</span>
+              </TableHead>
+              <TableHead className="min-w-[200px] text-xs font-semibold">
+                메모
+                <span className="block text-[10px] font-normal text-muted-foreground">Notes</span>
               </TableHead>
               <TableHead className="w-[56px] text-center text-xs font-semibold">수정</TableHead>
             </TableRow>
@@ -129,6 +157,31 @@ export function CompletionSummary({ subjects, onUpdate }: CompletionSummaryProps
                         <span className="text-[10px] font-semibold text-red-600">미확인</span>
                       </div>
                     )}
+                  </TableCell>
+
+                  {/* Notes */}
+                  <TableCell>
+                    <div className="flex items-center gap-1">
+                      <Textarea
+                        placeholder="메모 입력..."
+                        value={notesMap[subject.id] || ""}
+                        onChange={(e) =>
+                          setNotesMap((prev) => ({ ...prev, [subject.id]: e.target.value }))
+                        }
+                        rows={1}
+                        className="min-h-[32px] resize-none text-xs"
+                      />
+                      <Button
+                        size="icon"
+                        variant="outline"
+                        className="h-8 w-8 shrink-0"
+                        onClick={() => saveNotes(subject)}
+                        disabled={savingId === subject.id}
+                        aria-label="Save notes"
+                      >
+                        <Save className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
                   </TableCell>
 
                   <TableCell className="text-center">

@@ -37,6 +37,7 @@ export interface Subject {
   bloodTestDone?: boolean | null // 혈액검사 시행 여부
   bloodTestReason?: string | null // 혈액검사 미시행 사유
   nextVisitConfirmed?: boolean // 다음 예약일 확인 여부
+  summaryNotes?: string | null // 완료현황 전체 메모
 }
 
 export type FUKey = "fu1" | "fu2" | "fu3" | "fu4"
@@ -92,5 +93,6 @@ export function createDefaultSubject(site: Site, defaultInterval: VisitInterval 
     bloodTestDone: null,
     bloodTestReason: null,
     nextVisitConfirmed: false,
+    summaryNotes: null,
   }
 }
