@@ -102,7 +102,7 @@ function mapDbToSubject(db: Record<string, unknown>): Subject {
     createdAt: db.created_at as string,
     updatedAt: db.updated_at as string,
     bloodTestDone: db.blood_test_done as boolean | null,
-    nextVisitConfirmed: (db.next_visit_confirmed as boolean) ?? false,
+    nextVisitConfirmed: db.next_visit_confirmed as boolean,
   }
 }
 
