@@ -186,25 +186,25 @@ export function SubjectRow({ subject, onUpdate, onEdit, onDelete }: SubjectRowPr
           </div>
 
           {/* Baseline Blood Test & Next Visit Info */}
-          <div className="mb-2 grid grid-cols-2 gap-x-4 gap-y-1 rounded-md border border-border bg-card p-2 text-xs sm:grid-cols-3">
+          <div className="mb-2 grid grid-cols-2 gap-x-4 gap-y-1 rounded-md border border-border bg-card p-2 text-xs sm:grid-cols-2">
             <div>
               <span className="font-medium text-foreground">혈액검사 / Blood Test</span>
-              <div className={subject.bloodTestDone === null ? "text-red-600 font-semibold" : subject.bloodTestDone ? "text-emerald-600 font-semibold" : "text-amber-600"}>
-                {subject.bloodTestDone === true ? "완료" : subject.bloodTestDone === false ? "미시행" : "미입력"}
+              <div className={
+                subject.bloodTestDone === null || subject.bloodTestDone === undefined
+                  ? "text-red-600 font-semibold"
+                  : subject.bloodTestDone
+                  ? "text-emerald-600 font-semibold"
+                  : "text-amber-600 font-semibold"
+              }>
+                {subject.bloodTestDone === true ? "시행 / Done" : subject.bloodTestDone === false ? "미시행 / Not done" : "미입력"}
               </div>
             </div>
             <div>
-              <span className="font-medium text-foreground">다음 예약 / Next Visit</span>
-              <div className={!subject.baselineNextVisitDate ? "text-red-600 font-semibold" : "text-emerald-600 font-semibold"}>
-                {subject.baselineNextVisitDate ? "입력됨" : "미입력"}
+              <span className="font-medium text-foreground">다음 예약 확인 / Next Visit</span>
+              <div className={!subject.nextVisitConfirmed ? "text-red-600 font-semibold" : "text-emerald-600 font-semibold"}>
+                {subject.nextVisitConfirmed ? "확인 완료" : "미확인"}
               </div>
             </div>
-            {subject.bloodTestDone === false && subject.bloodTestReason && (
-              <div className="col-span-2 sm:col-span-1">
-                <span className="font-medium text-foreground">미시행 사유</span>
-                <div className="text-amber-600">{subject.bloodTestReason}</div>
-              </div>
-            )}
           </div>
 
           {/* LTF Toggle */}

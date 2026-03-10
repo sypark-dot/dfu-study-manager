@@ -33,10 +33,9 @@ export interface Subject {
   notes: string
   createdAt: string
   updatedAt: string
-  // Baseline 혈액검사 관련 필드
+  // Baseline 방문 정보
   bloodTestDone?: boolean | null // 혈액검사 시행 여부
-  bloodTestReason?: string | null // 혈액검사 미시행 사유
-  baselineNextVisitDate?: string | null // Baseline 다음 예약 날짜
+  nextVisitConfirmed?: boolean // 다음 예약일 확인 여부
 }
 
 export type FUKey = "fu1" | "fu2" | "fu3" | "fu4"
@@ -90,7 +89,6 @@ export function createDefaultSubject(site: Site, defaultInterval: VisitInterval 
     createdAt: now,
     updatedAt: now,
     bloodTestDone: null,
-    bloodTestReason: null,
-    baselineNextVisitDate: null,
+    nextVisitConfirmed: false,
   }
 }

@@ -20,6 +20,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog"
 import { Switch } from "@/components/ui/switch"
+import { Checkbox } from "@/components/ui/checkbox"
 import type { Subject, Site, VisitInterval } from "@/lib/types"
 import { createDefaultSubject, SITE_OPTIONS, SITE_LABELS } from "@/lib/types"
 
@@ -181,37 +182,53 @@ export function SubjectForm({ open, onClose, onSave, initialData }: SubjectFormP
             <span className="text-sm text-muted-foreground">2주 / 2wk</span>
           </div>
 
-          {/* Baseline 혈액검사 및 다음 예약 섹션 */}
+          {/* Baseline 방문 정보 */}
           <div className="rounded-md border border-border bg-muted/30 p-3">
             <h3 className="mb-3 text-sm font-semibold text-foreground">Baseline 방문 정보</h3>
-            <div className="flex items-center gap-3 rounded-md border border-border bg-card p-3">
-              <Label htmlFor="bloodTestDone" className="flex-1 text-sm">
-                혈액검사 시행 / Blood Test Done
-              </Label>
-              <Switch
-                id="bloodTestDone"
-                checked={formData.bloodTestDone === true}
-                onCheckedChange={(checked) => {
-                  setFormData((prev) => ({
-                    ...prev,
-                    bloodTestDone: checked,
-                    bloodTestReason: checked ? "" : prev.bloodTestReason,
-                  }))
-                }}
-              />
-            </div>
-            {!formData.bloodTestDone && (
-              <div className="mt-3 flex flex-col gap-1.5">
-                <Label htmlFor="bloodTestReason">혈액검사 미시행 사유 / Reason if not done</Label>
-                <Textarea
-                  id="bloodTestReason"
-                  placeholder="혈액검사를 하지 못한 경우 사유를 입력하세요..."
-                  value={formData.bloodTestReason || ""}
-                  onChange={(e) => handleChange("bloodTestReason", e.target.value)}
-                  rows={2}
-                />
+            <div className="flex flex-col gap-3">
+              {/* 혈액검사 버튼 그룹 */}
+              <div>
+                <Label className="mb-2 block text-sm">혈액검사 / Blood Test</Label>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setFormData((prev) => ({ ...prev, bloodTestDone: true }))}
+                    className={`flex-1 rounded-md border px-3 py-2 text-sm font-medium transition-colors ${
+                      formData.bloodTestDone === true
+                        ? "border-emerald-600 bg-emerald-600 text-white"
+                        : "border-border bg-card text-foreground hover:bg-muted"
+                    }`}
+                  >
+                    시행 / Done
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData((prev) => ({ ...prev, bloodTestDone: false }))}
+                    className={`flex-1 rounded-md border px-3 py-2 text-sm font-medium transition-colors ${
+                      formData.bloodTestDone === false
+                        ? "border-amber-500 bg-amber-500 text-white"
+                        : "border-border bg-card text-foreground hover:bg-muted"
+                    }`}
+                  >
+                    미시행 / Not done
+                  </button>
+                </div>
               </div>
-            )}
+
+              {/* 다음 예약일 확인 체크박스 */}
+              <div className="flex items-center gap-2 rounded-md border border-border bg-card px-3 py-2.5">
+                <Checkbox
+                  id="nextVisitConfirmed"
+                  checked={formData.nextVisitConfirmed === true}
+                  onCheckedChange={(checked) =>
+                    setFormData((prev) => ({ ...prev, nextVisitConfirmed: checked === true }))
+                  }
+                />
+                <Label htmlFor="nextVisitConfirmed" className="cursor-pointer text-sm">
+                  예약일 확인 완료 / Next visit confirmed
+                </Label>
+              </div>
+            </div>
           </div>
 
           <div className="flex flex-col gap-1.5">

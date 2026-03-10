@@ -102,8 +102,7 @@ function mapDbToSubject(db: Record<string, unknown>): Subject {
     createdAt: db.created_at as string,
     updatedAt: db.updated_at as string,
     bloodTestDone: db.blood_test_done as boolean | null,
-    bloodTestReason: db.blood_test_reason as string | null,
-    baselineNextVisitDate: db.baseline_next_visit_date as string | null,
+    nextVisitConfirmed: (db.next_visit_confirmed as boolean) ?? false,
   }
 }
 
@@ -125,7 +124,6 @@ function mapSubjectToDb(subject: Subject): Record<string, unknown> {
     created_at: subject.createdAt,
     updated_at: subject.updatedAt,
     blood_test_done: subject.bloodTestDone ?? null,
-    blood_test_reason: subject.bloodTestReason ?? null,
-    baseline_next_visit_date: subject.baselineNextVisitDate ?? null,
+    next_visit_confirmed: subject.nextVisitConfirmed ?? false,
   }
 }
