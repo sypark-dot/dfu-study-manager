@@ -192,7 +192,7 @@ export function SubjectForm({ open, onClose, onSave, initialData }: SubjectFormP
                 <div className="flex gap-2">
                   <button
                     type="button"
-                    onClick={() => setFormData((prev) => ({ ...prev, bloodTestDone: true }))}
+                    onClick={() => setFormData((prev) => ({ ...prev, bloodTestDone: true, bloodTestReason: null }))}
                     className={`flex-1 rounded-md border px-3 py-2 text-sm font-medium transition-colors ${
                       formData.bloodTestDone === true
                         ? "border-emerald-600 bg-emerald-600 text-white"
@@ -214,6 +214,20 @@ export function SubjectForm({ open, onClose, onSave, initialData }: SubjectFormP
                   </button>
                 </div>
               </div>
+
+              {/* 혈액검사 미시행 사유 - 미시행일 때만 표시 */}
+              {formData.bloodTestDone === false && (
+                <div className="flex flex-col gap-1.5">
+                  <Label htmlFor="bloodTestReason">미시행 사유 / Reason</Label>
+                  <Textarea
+                    id="bloodTestReason"
+                    placeholder="혈액검사를 하지 못한 이유를 적어주세요..."
+                    value={formData.bloodTestReason || ""}
+                    onChange={(e) => handleChange("bloodTestReason", e.target.value)}
+                    rows={2}
+                  />
+                </div>
+              )}
 
               {/* 다음 예약일 확인 체크박스 */}
               <div className="flex items-center gap-2 rounded-md border border-border bg-card px-3 py-2.5">

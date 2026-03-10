@@ -59,8 +59,6 @@ export async function updateSubject(subject: Subject): Promise<Subject> {
     updatedAt: new Date().toISOString(),
   })
 
-  console.log("[v0] Updating subject with data:", JSON.stringify(dbSubject, null, 2))
-
   const { data, error } = await supabase
     .from("subjects")
     .update(dbSubject)
@@ -70,13 +68,9 @@ export async function updateSubject(subject: Subject): Promise<Subject> {
 
   if (error) {
     console.error("updateSubject error:", error)
-    console.error("[v0] Error code:", error.code)
-    console.error("[v0] Error message:", error.message)
-    console.error("[v0] Error details:", error.details)
     throw error
   }
 
-  console.log("[v0] Update successful, response:", data)
   return mapDbToSubject(data)
 }
 
@@ -108,6 +102,7 @@ function mapDbToSubject(db: Record<string, unknown>): Subject {
     createdAt: db.created_at as string,
     updatedAt: db.updated_at as string,
     bloodTestDone: db.blood_test_done as boolean | null,
+    bloodTestReason: db.blood_test_reason as string | null,
     nextVisitConfirmed: db.next_visit_confirmed as boolean,
   }
 }
@@ -130,6 +125,7 @@ function mapSubjectToDb(subject: Subject): Record<string, unknown> {
     created_at: subject.createdAt,
     updated_at: subject.updatedAt,
     blood_test_done: subject.bloodTestDone ?? null,
+    blood_test_reason: subject.bloodTestReason ?? null,
     next_visit_confirmed: subject.nextVisitConfirmed ?? false,
   }
 }
