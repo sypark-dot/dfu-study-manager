@@ -25,7 +25,7 @@ export async function getSubjects(): Promise<Subject[]> {
     if (!res.ok) throw new Error("fetch 실패")
     const data = await res.json()
 return Array.isArray(data) 
-  ? data.filter((s: Subject) => s.subjectId && typeof s.subjectId === "string")
+? data.filter((s: Subject) => s.subjectId !== null && s.subjectId !== undefined)
   : []
   } catch (e) {
     console.error("getSubjects error:", e)
