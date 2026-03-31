@@ -180,7 +180,38 @@ export function SubjectForm({ open, onClose, onSave, initialData }: SubjectFormP
             />
             <span className="text-sm text-muted-foreground">2주 / 2wk</span>
           </div>
-
+{/* FU별 개별 간격 설정 */}
+<div className="rounded-md border border-border bg-muted/30 p-3">
+  <h3 className="mb-3 text-sm font-semibold text-foreground">FU별 방문 간격 / Per-visit Interval</h3>
+  <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+    {(["fu1", "fu2", "fu3", "fu4"] as const).map((key) => (
+      <div key={key} className="flex flex-col gap-1.5">
+        <Label className="text-xs">{key.toUpperCase()}</Label>
+        <Select
+          value={String(formData.visits[key].interval ?? formData.visitInterval)}
+          onValueChange={(v) => {
+            const interval = parseInt(v) as VisitInterval
+            setFormData((prev) => ({
+              ...prev,
+              visits: {
+                ...prev.visits,
+                [key]: { ...prev.visits[key], interval },
+              },
+            }))
+          }}
+        >
+          <SelectTrigger className="h-8 text-xs">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="1">1주 / 1wk</SelectItem>
+            <SelectItem value="2">2주 / 2wk</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+    ))}
+  </div>
+</div>
           {/* Baseline 혈액검사 및 다음 예약 섹션 */}
           <div className="rounded-md border border-border bg-muted/30 p-3">
             <h3 className="mb-3 text-sm font-semibold text-foreground">Baseline 방문 정보</h3>
