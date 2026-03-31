@@ -24,7 +24,9 @@ export async function getSubjects(): Promise<Subject[]> {
     const res = await fetch(SCRIPT_URL)
     if (!res.ok) throw new Error("fetch 실패")
     const data = await res.json()
-    return Array.isArray(data) ? data : []
+return Array.isArray(data) 
+  ? data.filter((s: Subject) => s.subjectId && typeof s.subjectId === "string")
+  : []
   } catch (e) {
     console.error("getSubjects error:", e)
     return []
