@@ -39,6 +39,7 @@ export function Dashboard({ onLogout }: DashboardProps) {
   const [todayMode, setTodayMode] = useState(false)
   const [exactTodayMode, setExactTodayMode] = useState(false)
   const [viewMode, setViewMode] = useState<"list" | "summary">("list")
+  const [sortAsc, setSortAsc] = useState(true)
 
   useEffect(() => {
     getSubjects()
@@ -67,8 +68,11 @@ export function Dashboard({ onLogout }: DashboardProps) {
     }
     if (exactTodayMode) list = list.filter(hasVisitExactlyToday)
     else if (todayMode) list = list.filter(hasVisitToday)
-    return list.sort((a, b) => a.subjectId.localeCompare(b.subjectId))
-  }, [subjects, siteFilter, staffFilter, searchQuery, todayMode, exactTodayMode])
+    return list.sort((a, b) => {
+  const diff = Number(a.subjectId) - Number(b.subjectId)
+  return sortAsc ? diff : -diff
+})
+  }, [subjects, siteFilter, staffFilter, searchQuery, todayMode, exactTodayMode, sortAsc])
 
   const handleAdd = useCallback(async (subject: Subject) => {
     try {
@@ -204,7 +208,9 @@ export function Dashboard({ onLogout }: DashboardProps) {
               완료현황
             </Button>
           </div>
-          <Badge variant="secondary" className="ml-auto text-xs">{filteredSubjects.length}건 / {subjects.length}건</Badge>
+          <Button size="sm" variant="outline" className="h-8 px-2 text-xs" onClick={() => setSortAsc(p => !p)}>
+  Sub No. {sortAsc ? "↑" : "↓"}
+</Button><Badge variant="secondary" className="ml-auto text-xs">{filteredSubjects.length}건 / {subjects.length}건</Badge>
         </div>
       </div>
 
