@@ -1,4 +1,4 @@
-export type Site = "IJH" | "SCH" | "ILH"
+export type Site = "IJH" | "SCH" | "EWH"
 
 export type VisitInterval = 1 | 2
 
@@ -48,12 +48,12 @@ export const FU_LABELS: Record<FUKey, string> = {
   fu4: "FU4",
 }
 
-export const SITE_OPTIONS: Site[] = ["IJH", "SCH", "ILH"]
+export const SITE_OPTIONS: Site[] = ["IJH", "SCH", "EWH"]
 
 export const SITE_LABELS: Record<Site, string> = {
   IJH: "IJH (인제대학교 일산백병원)",
   SCH: "SCH (순천향대학교병원)",
-  ILH: "ILH (이대목동병원)",
+  EWH: "EWH (이대목동병원)",
 }
 
 export function createEmptyVisit(interval: VisitInterval = 2): VisitData {
