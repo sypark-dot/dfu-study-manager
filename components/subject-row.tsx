@@ -95,12 +95,13 @@ className={`shrink-0 text-[10px] font-semibold ${
             const colorClass = getVisitColorClass(visit, expected[key])
             return (
               <span
-                key={key}
-                className={`inline-flex h-6 w-6 items-center justify-center rounded text-[10px] font-medium ${colorClass}`}
-                title={`${key.toUpperCase()}: ${visit.status}`}
-              >
-                {STATUS_ICONS_SMALL[visit.status]}
-              </span>
+  key={key}
+  className={`inline-flex h-8 w-8 items-center justify-center rounded text-xs font-semibold gap-0.5 flex-col ${colorClass}`}
+  title={`${key.toUpperCase()}: ${visit.status}`}
+>
+  <span className="text-[9px] leading-none opacity-70">{key.toUpperCase()}</span>
+  {STATUS_ICONS_SMALL[visit.status]}
+</span>
             )
           })}
         </div>
