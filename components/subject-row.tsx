@@ -60,9 +60,16 @@ export function SubjectRow({ subject, onUpdate, onEdit, onDelete }: SubjectRowPr
         {/* Subject info */}
         <div className="flex min-w-0 flex-1 flex-col gap-0.5 sm:flex-row sm:items-center sm:gap-3">
           <div className="flex items-center gap-2">
-            <Badge variant="outline" className="shrink-0 text-[10px] font-semibold">
-              {subject.site}
-            </Badge>
+<Badge
+  variant="outline"
+className={`shrink-0 text-[10px] font-semibold ${
+  subject.site === "IJH" ? "border-purple-400 bg-purple-50 text-purple-700" :
+  subject.site === "SCH" ? "border-blue-400 bg-blue-50 text-blue-700" :
+  "border-emerald-400 bg-emerald-50 text-emerald-700"
+}`}
+>
+  {subject.site}
+</Badge>
             {subject.isLTF && (
               <Badge variant="destructive" className="shrink-0 text-[10px] font-semibold">
                 LTF
