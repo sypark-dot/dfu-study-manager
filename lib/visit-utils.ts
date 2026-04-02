@@ -1,11 +1,5 @@
 import { addDays, addWeeks, differenceInDays, format, parseISO, isValid } from "date-fns"
 import type { Subject, FUKey, VisitData } from "./types"
-
-/**
- * Calculate the expected visit dates for a subject based on baseline and per-visit intervals.
- * Each visit has its own interval setting.
- * Skipped visits do NOT add their interval to subsequent visit date calculations.
- */
 export function getExpectedDates(subject: Subject): Record<FUKey, Date | null> {
   if (!subject.baselineDate) {
     return { fu1: null, fu2: null, fu3: null, fu4: null }
@@ -22,15 +16,19 @@ export function getExpectedDates(subject: Subject): Record<FUKey, Date | null> {
   let cumulativeWeeks = 0
   for (const key of fuKeys) {
     const visit = subject.visits[key]
-    // Use per-visit interval, fallback to subject-level default for backwards compatibility
     const visitInterval = visit.interval ?? subject.visitInterval ?? 2
-    
-    // Only add interval if this visit is NOT skipped
+
     if (visit.status !== "skipped") {
       cumulativeWeeks += visitInterval
     }
-    
-    result[key] = addWeeks(baseline, cumulativeWeeks)
+
+    // ✅ nextVisitDate 있으면 그걸 우선 사용
+    if (visit.nextVisitDate) {
+      const parsed = parseISO(visit.nextVisitDate)
+      result[key] = isValid(parsed) ? parsed : addWeeks(baseline, cumulativeWeeks)
+    } else {
+      result[key] = addWeeks(baseline, cumulativeWeeks)
+    }
   }
 
   return result as Record<FUKey, Date | null>
