@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo, useCallback, useEffect } from "react"
-import { Plus, Download, MapPin, CalendarCheck, Search, LogOut, Loader2, List, ClipboardList } from "lucide-react"
+import { Plus, Download, MapPin, CalendarCheck, Search, LogOut, Loader2, List, ClipboardList, Calendar, ChevronDown, ChevronUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -14,16 +14,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import type { Subject, Site } from "@/lib/types"
-import { SITE_OPTIONS, SITE_LABELS, createDefaultSubject } from "@/lib/types"
+import type { Subject } from "@/lib/types"
+import { SITE_OPTIONS, createDefaultSubject } from "@/lib/types"
 import { getSubjects, addSubject, updateSubject, deleteSubject } from "@/lib/store"
 import { hasVisitToday, hasVisitExactlyToday } from "@/lib/visit-utils"
 import { exportToCSV } from "@/lib/export-utils"
 import { SubjectForm } from "./subject-form"
 import { SubjectRow } from "./subject-row"
 import { CompletionSummary } from "./completion-summary"
-import { Calendar } from "lucide-react"
 import { VisitCalendar } from "./visit-calendar"
+
 interface DashboardProps {
   onLogout: () => void
 }
@@ -33,7 +33,6 @@ export function Dashboard({ onLogout }: DashboardProps) {
   const [loading, setLoading] = useState(true)
   const [formOpen, setFormOpen] = useState(false)
   const [editingSubject, setEditingSubject] = useState<Subject | null>(null)
-
   const [siteFilter, setSiteFilter] = useState<string>("all")
   const [staffFilter, setStaffFilter] = useState("")
   const [searchQuery, setSearchQuery] = useState("")
@@ -71,9 +70,9 @@ export function Dashboard({ onLogout }: DashboardProps) {
     if (exactTodayMode) list = list.filter(hasVisitExactlyToday)
     else if (todayMode) list = list.filter(hasVisitToday)
     return list.sort((a, b) => {
-  const diff = Number(a.subjectId) - Number(b.subjectId)
-  return sortAsc ? diff : -diff
-})
+      const diff = Number(a.subjectId) - Number(b.subjectId)
+      return sortAsc ? diff : -diff
+    })
   }, [subjects, siteFilter, staffFilter, searchQuery, todayMode, exactTodayMode, sortAsc])
 
   const handleAdd = useCallback(async (subject: Subject) => {
@@ -189,30 +188,18 @@ export function Dashboard({ onLogout }: DashboardProps) {
             <Label htmlFor="exact-today-mode" className="cursor-pointer text-xs">당일 방문</Label>
             <Switch id="exact-today-mode" checked={exactTodayMode} onCheckedChange={(checked) => { setExactTodayMode(checked); if (checked) setTodayMode(false) }} className="scale-75" />
           </div>
-          {/* View Mode Toggle */}
           <div className="flex items-center gap-1 rounded-md border border-border bg-card p-0.5">
-            <Button
-              size="sm"
-              variant={viewMode === "list" ? "default" : "ghost"}
-              className="h-7 px-2 text-xs"
-              onClick={() => setViewMode("list")}
-            >
-              <List className="mr-1 h-3.5 w-3.5" />
-              목록
+            <Button size="sm" variant={viewMode === "list" ? "default" : "ghost"} className="h-7 px-2 text-xs" onClick={() => setViewMode("list")}>
+              <List className="mr-1 h-3.5 w-3.5" />목록
             </Button>
-            <Button
-              size="sm"
-              variant={viewMode === "summary" ? "default" : "ghost"}
-              className="h-7 px-2 text-xs"
-              onClick={() => setViewMode("summary")}
-            >
-              <ClipboardList className="mr-1 h-3.5 w-3.5" />
-              완료현황
+            <Button size="sm" variant={viewMode === "summary" ? "default" : "ghost"} className="h-7 px-2 text-xs" onClick={() => setViewMode("summary")}>
+              <ClipboardList className="mr-1 h-3.5 w-3.5" />완료현황
             </Button>
           </div>
           <Button size="sm" variant="outline" className="h-8 px-2 text-xs" onClick={() => setSortAsc(p => !p)}>
-  Sub No. {sortAsc ? "↑" : "↓"}
-</Button><Badge variant="secondary" className="ml-auto text-xs">{filteredSubjects.length}건 / {subjects.length}건</Badge>
+            Sub No. {sortAsc ? "↑" : "↓"}
+          </Button>
+          <Badge variant="secondary" className="ml-auto text-xs">{filteredSubjects.length}건 / {subjects.length}건</Badge>
         </div>
       </div>
 
@@ -226,33 +213,35 @@ export function Dashboard({ onLogout }: DashboardProps) {
         </div>
       </div>
 
-{/* 방문 캘린더 */}
-<div className="border-b border-border bg-card/50">
-  <div className="mx-auto max-w-7xl px-4">
-   <button
-  className="flex w-full items-center gap-2 py-2 px-3 text-xs font-semibold text-foreground hover:bg-muted rounded-md border border-border transition-colors"
-  onClick={() => setCalendarOpen((p) => !p)}
->
-  <Calendar className="h-3.5 w-3.5 text-primary" />
-  방문 일정 캘린더
-<span className="ml-auto text-muted-foreground">{calendarOpen ? "▲" : "▼"}</span>
-</button>
-    {calendarOpen && (
-      <div className="pb-4">
-        <VisitCalendar subjects={subjects} />
+      <div className="border-b border-border bg-card/50">
+        <div className="mx-auto max-w-7xl px-4">
+          <button
+            className="flex w-full items-center gap-2 py-2 px-3 text-xs font-semibold text-foreground hover:bg-muted rounded-md border border-border transition-colors"
+            onClick={() => setCalendarOpen((p) => !p)}
+          >
+            <Calendar className="h-3.5 w-3.5 text-primary" />
+            방문 일정 캘린더
+            <span className="ml-auto">
+              {calendarOpen ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+            </span>
+          </button>
+          {calendarOpen && (
+            <div className="pb-4">
+              <VisitCalendar subjects={subjects} />
+            </div>
+          )}
+        </div>
       </div>
-    )}
-  </div>
-</div>
-      
-      {viewMode === "list" && (
-   <div className="hidden items-center border-b border-border bg-muted/50 px-4 py-2 text-xs font-semibold text-foreground sm:flex">
-  <span className="w-6" />
-  <span className="flex-1">대상자 정보 / Subject Info</span>
-  <span className="w-32 text-center">FU1-FU4</span>
-  <span className="w-16" />
-</div>
 
+      {viewMode === "list" && (
+        <div className="mx-auto w-full max-w-7xl">
+          <div className="hidden items-center border-b border-border bg-muted/50 px-4 py-2 text-xs font-semibold text-foreground sm:flex">
+            <span className="w-6" />
+            <span className="flex-1">대상자 정보 / Subject Info</span>
+            <span className="w-32 text-center">FU1-FU4</span>
+            <span className="w-16" />
+          </div>
+        </div>
       )}
 
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-2">
