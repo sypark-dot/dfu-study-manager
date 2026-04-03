@@ -252,7 +252,7 @@ export function Dashboard({ onLogout }: DashboardProps) {
   <span className="w-32 text-center">FU1-FU4</span>
   <span className="w-16" />
 </div>
-  </div>
+
       )}
 
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-2">
