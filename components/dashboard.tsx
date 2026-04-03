@@ -41,6 +41,7 @@ export function Dashboard({ onLogout }: DashboardProps) {
   const [exactTodayMode, setExactTodayMode] = useState(false)
   const [viewMode, setViewMode] = useState<"list" | "summary">("list")
   const [sortAsc, setSortAsc] = useState(true)
+  const [calendarOpen, setCalendarOpen] = useState(false)
 
   useEffect(() => {
     getSubjects()
