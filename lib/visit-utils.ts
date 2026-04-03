@@ -32,35 +32,6 @@ export function getExpectedDates(subject: Subject): Record<FUKey, Date | null> {
   return result as Record<FUKey, Date | null>
 }
 
-  const baseline = parseISO(subject.baselineDate)
-  if (!isValid(baseline)) {
-    return { fu1: null, fu2: null, fu3: null, fu4: null }
-  }
-
-  const fuKeys: FUKey[] = ["fu1", "fu2", "fu3", "fu4"]
-  const result: Record<string, Date | null> = {}
-
-  let cumulativeWeeks = 0
-  for (const key of fuKeys) {
-    const visit = subject.visits[key]
-    const visitInterval = visit.interval ?? subject.visitInterval ?? 2
-
-    if (visit.status !== "skipped") {
-      cumulativeWeeks += visitInterval
-    }
-
-    // ✅ nextVisitDate 있으면 그걸 우선 사용
-    if (visit.nextVisitDate) {
-      const parsed = parseISO(visit.nextVisitDate)
-      result[key] = isValid(parsed) ? parsed : addWeeks(baseline, cumulativeWeeks)
-    } else {
-      result[key] = addWeeks(baseline, cumulativeWeeks)
-    }
-  }
-
-  return result as Record<FUKey, Date | null>
-}
-
 /**
  * Get the window dates for a given expected date (+-3 days)
  */
