@@ -229,14 +229,14 @@ export function Dashboard({ onLogout }: DashboardProps) {
 {/* 방문 캘린더 */}
 <div className="border-b border-border bg-card/50">
   <div className="mx-auto max-w-7xl px-4">
-    <button
-      className="flex w-full items-center gap-2 py-2 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
-      onClick={() => setCalendarOpen((p) => !p)}
-    >
-      <Calendar className="h-3.5 w-3.5" />
-      방문 일정 캘린더
-      <span className="ml-auto">{calendarOpen ? "▲" : "▼"}</span>
-    </button>
+   <button
+  className="flex w-full items-center gap-2 py-2 px-3 text-xs font-semibold text-foreground hover:bg-muted rounded-md border border-border transition-colors"
+  onClick={() => setCalendarOpen((p) => !p)}
+>
+  <Calendar className="h-3.5 w-3.5 text-primary" />
+  방문 일정 캘린더
+  <span className="ml-auto text-muted-foreground">{calendarOpen ? "▲" : "▼"}</span>
+</button>
     {calendarOpen && (
       <div className="pb-4">
         <VisitCalendar subjects={subjects} />
