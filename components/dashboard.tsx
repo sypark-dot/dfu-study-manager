@@ -22,7 +22,8 @@ import { exportToCSV } from "@/lib/export-utils"
 import { SubjectForm } from "./subject-form"
 import { SubjectRow } from "./subject-row"
 import { CompletionSummary } from "./completion-summary"
-
+import { Calendar } from "lucide-react"
+import { VisitCalendar } from "./visit-calendar"
 interface DashboardProps {
   onLogout: () => void
 }
