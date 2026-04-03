@@ -246,14 +246,13 @@ export function Dashboard({ onLogout }: DashboardProps) {
 </div>
       
       {viewMode === "list" && (
-        <div className="mx-auto w-full max-w-7xl">
-          <div className="hidden items-center border-b border-border bg-muted/50 px-4 py-2 text-xs font-medium text-muted-foreground sm:flex">
-            <span className="w-6" />
-            <span className="flex-1">대상자 정보 / Subject Info</span>
-            <span className="w-32 text-center">FU1-FU4</span>
-            <span className="w-16" />
-          </div>
-        </div>
+   <div className="hidden items-center border-b border-border bg-muted/50 px-4 py-2 text-xs font-semibold text-foreground sm:flex">
+  <span className="w-6" />
+  <span className="flex-1">대상자 정보 / Subject Info</span>
+  <span className="w-32 text-center">FU1-FU4</span>
+  <span className="w-16" />
+</div>
+  </div>
       )}
 
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-2">
