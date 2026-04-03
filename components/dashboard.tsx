@@ -235,7 +235,7 @@ export function Dashboard({ onLogout }: DashboardProps) {
 >
   <Calendar className="h-3.5 w-3.5 text-primary" />
   방문 일정 캘린더
-  <span className="ml-auto text-muted-foreground">{calendarOpen ? "▲" : "▼"}</span>
+<span className="ml-auto text-muted-foreground">{calendarOpen ? "△" : "▽"}</span>
 </button>
     {calendarOpen && (
       <div className="pb-4">
