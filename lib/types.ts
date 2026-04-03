@@ -37,6 +37,8 @@ export interface Subject {
   bloodTestResult?: string | null // 혈액검사 결과
   bloodTestReason?: string | null // 혈액검사 미시행 사유
   baselineNextVisitDate?: string | null // Baseline 다음 예약 날짜
+  baselineEmrCrc?: boolean | null
+  baselineEmrPi?: boolean | null  
 }
 
 export type FUKey = "fu1" | "fu2" | "fu3" | "fu4"
