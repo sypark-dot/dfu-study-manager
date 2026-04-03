@@ -14,14 +14,23 @@ export function getExpectedDates(subject: Subject): Record<FUKey, Date | null> {
   const result: Record<string, Date | null> = {}
   let cumulativeWeeks = 0
 
-  for (const key of fuKeys) {
+  const prevNextVisitDates: (string | null | undefined)[] = [
+    subject.baselineNextVisitDate,
+    subject.visits.fu1.nextVisitDate,
+    subject.visits.fu2.nextVisitDate,
+    subject.visits.fu3.nextVisitDate,
+  ]
+
+  for (let i = 0; i < fuKeys.length; i++) {
+    const key = fuKeys[i]
     const visit = subject.visits[key]
     const visitInterval = visit.interval ?? subject.visitInterval ?? 2
     if (visit.status !== "skipped") {
       cumulativeWeeks += visitInterval
     }
-    if (visit.nextVisitDate) {
-      const parsed = parseISO(visit.nextVisitDate)
+    const prevNext = prevNextVisitDates[i]
+    if (prevNext) {
+      const parsed = parseISO(prevNext)
       result[key] = isValid(parsed) ? parsed : addWeeks(baseline, cumulativeWeeks)
     } else {
       result[key] = addWeeks(baseline, cumulativeWeeks)
@@ -82,44 +91,31 @@ export function formatDate(dateStr: string | null | undefined): string {
   }
 }
 
-export function getExpectedDates(subject: Subject): Record<FUKey, Date | null> {
-  if (!subject.baselineDate) {
-    return { fu1: null, fu2: null, fu3: null, fu4: null }
-  }
-  const baseline = parseISO(subject.baselineDate)
-  if (!isValid(baseline)) {
-    return { fu1: null, fu2: null, fu3: null, fu4: null }
-  }
-
+export function hasVisitToday(subject: Subject): boolean {
+  const expected = getExpectedDates(subject)
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
   const fuKeys: FUKey[] = ["fu1", "fu2", "fu3", "fu4"]
-  const result: Record<string, Date | null> = {}
-  let cumulativeWeeks = 0
+  return fuKeys.some((key) => {
+    if (subject.visits[key].status !== "pending") return false
+    const exp = expected[key]
+    if (!exp) return false
+    const { start, end } = getWindowDates(exp)
+    return today >= start && today <= end
+  })
+}
 
-  // 이전 방문의 nextVisitDate (첫 번째는 baselineNextVisitDate)
-  const prevNextVisitDates: (string | null | undefined)[] = [
-    subject.baselineNextVisitDate,
-    subject.visits.fu1.nextVisitDate,
-    subject.visits.fu2.nextVisitDate,
-    subject.visits.fu3.nextVisitDate,
-  ]
-
-  for (let i = 0; i < fuKeys.length; i++) {
-    const key = fuKeys[i]
-    const visit = subject.visits[key]
-    const visitInterval = visit.interval ?? subject.visitInterval ?? 2
-
-    if (visit.status !== "skipped") {
-      cumulativeWeeks += visitInterval
-    }
-
-    const prevNext = prevNextVisitDates[i]
-    if (prevNext) {
-      const parsed = parseISO(prevNext)
-      result[key] = isValid(parsed) ? parsed : addWeeks(baseline, cumulativeWeeks)
-    } else {
-      result[key] = addWeeks(baseline, cumulativeWeeks)
-    }
-  }
-
-  return result as Record<FUKey, Date | null>
+export function hasVisitExactlyToday(subject: Subject): boolean {
+  const expected = getExpectedDates(subject)
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const fuKeys: FUKey[] = ["fu1", "fu2", "fu3", "fu4"]
+  return fuKeys.some((key) => {
+    if (subject.visits[key].status !== "pending") return false
+    const exp = expected[key]
+    if (!exp) return false
+    const expDate = new Date(exp)
+    expDate.setHours(0, 0, 0, 0)
+    return expDate.getTime() === today.getTime()
+  })
 }
